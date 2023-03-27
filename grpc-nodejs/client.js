@@ -25,6 +25,9 @@ const client = new MahasiswaService(
 )
 
 client.getAll({}, (error, mahasiswa) => {
-  if(!error) throw error
-    console.log(mahasiswa);
+  if(error) {
+    console.log(error)
+    throw error
+  }
+  console.log(mahasiswa);
 })
