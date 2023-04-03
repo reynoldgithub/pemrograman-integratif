@@ -5,7 +5,7 @@ import path from 'path'
 import { UserID } from '../proto/userPackage/UserID'
 import { User } from '../proto/userPackage/User'
 import { UserWithID } from '../proto/userPackage/UserWithID'
-import readline from 'readline';
+import express, { Request, Response } from 'express'
 
 const PROTO_PATH : string = "../../../proto/user.proto"
 const PORT : number = 5001
@@ -35,77 +35,74 @@ client.waitForReady(deadline, (err) => {
   onClientReady()
 })
 
-const createInput : User = {
-  name : "Putra",
-  email : "putra@gmail.com",
-  age : "24",
-  password : "password"
-}
-
-const updateInput : User = {
-  name : "Putra",
-  email : "putra@gmail.com",
-  age : "24",
-  password : "password"
-}
-
-const userId : string = "6429a01cadd3919bfcde0148" 
 
 const onClientReady = () => {
   console.log(`Client running on port ${PORT}`)
-  // client.GetAll(
-  //   {},
-  //   (err, res) => {
-  //     if(err) {
-  //       console.error(err)
-  //       return
-  //     }
-  //     console.log(res)
-  //   }
- 
-  // )
+  const app = express()
+  app.use(express.json())
 
-  // test create user
-  // const user : User = createInput 
-  // client.createUser(user, 
-  //   (err, res) => {
-  //     if(err) {
-  //       console.error(err)
-  //       return
-  //     }
-  //     console.log(res)
-  //   }
-  // )
-
-
-  // test update user
-  // const user : UserWithID = {
-  //   userId : {
-  //     id : userId
-  //   },
-  //   user : updateInput 
-  // }
-  // client.updateUser(user, 
-  //   (err, res) => {
-  //     if(err) {
-  //       console.error(err)
-  //       return
-  //     }
-  //     console.log(res)
-  //   }
-  // )
+  app.get('/user', (req : Request, res : Response) => {
+    client.GetAll(
+      {},
+      (err, _res) => {
+        if(err) {
+          console.error(err)
+          return
+        }
+        res.send(_res)
+    })
+  })
   
-  // test delete user
-  // const userId : UserID = {
-  //   id : "6429a01cadd3919bfcde0148"
-  // }
-  // client.deleteUser(userId, 
-  //   (err, res) => {
-  //     if(err) {
-  //       console.error(err)
-  //       return
-  //     }
-  //     console.log(res)
-  //   }
-  // )
+  app.post('/user', (req : Request, res : Response) => {
+    const createInput : User = req.body
+    const user : User = createInput 
+    client.createUser(user, 
+      (err, _res) => {
+        if(err) {
+          console.error(err)
+          return
+        }
+        res.send(_res)
+      }
+    )
+  })
+  
+  app.put('/user/:id', (req : Request, res : Response) => {
+    const user : UserWithID = {
+      userId : {
+        id : req.params.id 
+      },
+      user : req.body 
+    }
+
+    client.updateUser(user, 
+      (err, _res) => {
+        if(err) {
+          console.error(err)
+          return
+        }
+        res.send(_res)
+      }
+    )
+  })
+
+  app.delete('/user/:id', (req : Request, res : Response) => {
+    const userId : UserID = {
+      id : req.params.id
+    }
+    client.deleteUser(userId, 
+      (err, _res) => {
+        if(err) {
+          console.error(err)
+          return
+        }
+        res.send(_res)
+      }
+    )
+  })
+
+  app.listen(3000, () => {
+    console.log("express is started")
+  })
+
 }
