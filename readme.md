@@ -1,5 +1,5 @@
-# gRPC using Typescript CRUD 
-
+# gRPC using Typescript CRUD
+ 
 ## Documentation
 
 ### Read
